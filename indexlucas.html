@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Elementos de aseo</title>
+  <style>
+    input[type='submit'], button, [aria-label]{
+      cursor: pointer;
+    }
+    #spoiler{
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<form action="javascript:void(0);" method="POST" onsubmit="app.Add()"> 
+  <!-- El operador void especifica una expresión que se evalúa sin devolver un valor. expresion es una expresión JavaScript para evaluar. Puede usar el operador void para especificar una expresión como un enlace de hipertexto -->
+  <input type="text" id="add-name" placeholder="New elemento de aseo">
+  <input type="submit" value="Add">
+</form>
+
+<div id="spoiler" role="aria-hidden">
+  <form action="javascript:void(0);" method="POST" id="saveEdit">
+    <input type="text" id="edit-name">
+    <input type="submit" value="Edit" /> <a onclick="CloseInput()" aria-label="Close">&#10006;</a>
+  </form>
+</div>
+
+<p id="aseo"></p>
+
+<table>
+  <tr>
+    <th>Tipos</th>
+  </tr>
+    <tbody id="aseos">
+    </tbody>
+</table>
+
+<script>
+var app = new function() {
+  this.el = document.getElementById('aseos');
+  this.elementos = ['Jabon', 'cepilo de dientes', 'Toalla', 'Champù', 'Jabon liquido'];
+  this.Count = function(data) {
+    var el   = document.getElementById('aseo');
+    var name = 'aseo';
+    if (data) {
+      if (data > 1) {
+        name = 'elementos de  aseo';
+      }
+      el.innerHTML = data + ' ' + name ;
+    } else {
+      el.innerHTML = 'No ' + name;
+    }
+  };
+ 
+  this.FetchAll = function() {
+    //  Fetch proporciona una interfaz JavaScript para acceder y manipular partes del canal HTTP, tales como peticiones y respuestas.
+    var data = '';
+    if (this.elementos.length > 0) {
+      for (i = 0; i < this.elementos.length; i++) {
+        data += '<tr>';
+        data += '<td>' + this.elementos[i] + '</td>';
+        data += '<td><button onclick="app.Edit(' + i + ')">Edit</button></td>';
+        data += '<td><button onclick="app.Delete(' + i + ')">Delete</button></td>';
+        data += '</tr>';
+      }
+    }
+    this.Count(this.elementos.length);
+    return this.el.innerHTML = data;
+  };
+  this.Add = function () {
+    el = document.getElementById('add-name');
+    // Get the value
+    var metodo = el.value;
+    if (metodo) {
+      // Add the new value
+      this.elementos.push(metodo.trim());
+      // Reset input value
+      el.value = '';
+      // Dislay the new list
+      this.FetchAll();
+    }
+  };
+  this.Edit = function (item) {
+    var el = document.getElementById('edit-name');
+    // Display value in the field
+    el.value = this.elementos[item];
+    // Display fields
+    document.getElementById('spoiler').style.display = 'block';
+    self = this;
+    document.getElementById('saveEdit').onsubmit = function() {
+      // Get value
+      var metodo = el.value;
+      if (metodo) {
+        // Edit value
+        self.elementos.splice(item, 1, metodo.trim());
+        // Display the new list
+        self.FetchAll();
+        // Hide fields
+        CloseInput();
+      }
+    }
+  };
+  this.Delete = function (item) {
+    // Delete the current row
+    this.elementos.splice(item, 1);
+    // Display the new list
+    this.FetchAll();
+  };
+ 
+}
+app.FetchAll();
+function CloseInput() {
+  document.getElementById('spoiler').style.display = 'none';
+}
+</script>
+</body>
+</html>
